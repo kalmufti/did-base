@@ -1,0 +1,49 @@
+#!/bin/ash
+
+# Setup dbus data
+/usr/bin/dbus-uuidgen > /var/lib/dbus/machine-id
+/usr/bin/dbus-daemon --config-file=/usr/share/dbus-1/system.conf
+
+# Lanuch virtual display using Xvfb
+Xvfb :0 -screen 0 1920x1080x24 > /dev/null 2>&1 &
+xvfb_pid=$!
+if [[ -e /proc/$xvfp_pid ]]; then
+  echo "start virtual display"
+else
+  echo "failed to start xvfb"
+fi
+
+# the hero of the show
+novnc_server --listen $NO_VNC_PORT --vnc localhost:$VNC_PORT > /dev/null 2>&1 &
+novnc_pid=$!
+if [[ -e /proc/$novnc_pid ]]; then
+  ln -s /usr/share/novnc/vnc.html /usr/share/novnc/index.html
+  echo "start novnc server"
+else
+  echo "failed to start novnc"
+fi
+
+# Lanuch a vnc server used by novnc
+Xvnc -SecurityTypes None :1 > /dev/null 2>&1 &
+xvnc_pid=$!
+if [[ -e /proc/$xvnc_pid ]]; then
+  echo "start vnc server"
+else
+  echo "failed to start xvnc"
+fi
+
+# Launch Xfce4 desktop environment
+xfce4-session > /dev/null 2>&1 &
+xfce_pid=$!
+sleep 1
+if [[ -e /proc/$xfce_pid ]]; then
+  /usr/bin/xfconf-query -c xsettings -p /Net/IconThemeName -s adwaita-xfce
+  echo "start xfce4 desktop"
+else
+  echo "failed to start xfce"
+fi
+
+echo "Desktop is running on:"
+echo "http://$HOST_ADDR:6901"
+
+wait
