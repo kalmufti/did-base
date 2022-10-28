@@ -1,0 +1,4 @@
+#!/bin/bash
+
+docker rmi kalmufti/did-base
+docker build -t kalmufti/did-base .
