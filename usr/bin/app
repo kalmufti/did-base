@@ -35,7 +35,6 @@ fi
 # Launch Xfce4 desktop environment
 xfce4-session > /dev/null 2>&1 &
 xfce_pid=$!
-sleep 1
 if [[ -e /proc/$xfce_pid ]]; then
   /usr/bin/xfconf-query -c xsettings -p /Net/IconThemeName -s adwaita-xfce
   echo "start xfce4 desktop"
